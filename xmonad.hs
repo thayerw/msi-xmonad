@@ -37,7 +37,6 @@ main = do
             `additionalMouseBindings` myButtons
 
 myLogHook h = dynamicLogWithPP $ myXmobarPP { ppOutput = hPutStrLn h }
---myLogHook h = dynamicLogWithPP $ myDzenPP { ppOutput = hPutStrLn h }
 
 myXmobar   = "xmobar ~/.xmonad/xmobarrc"
 myXmobarPP = xmobarPP
@@ -48,17 +47,6 @@ myXmobarPP = xmobarPP
     , ppSep     = "     "
     , ppLayout  = xmobarColor "#aaaaaa" "" . wrap "·" "·"
     , ppTitle   = xmobarColor "#ffffff" "" . shorten 25
-    }
-
-myDzen    = "dzen2 -x '0' -y '0' -h '20' -w '370' -ta 'l' -fg '#777777' -bg '#222222' -fn 'arial:bold:size=11'"
-myDzenPP  = dzenPP
-    { ppCurrent = dzenColor "#3399ff" "" . wrap " " " "
-    , ppHidden  = dzenColor "#dddddd" "" . wrap " " " "
-    , ppHiddenNoWindows = dzenColor "#777777" "" . wrap " " " "
-    , ppUrgent  = dzenColor "#ff0000" "" . wrap " " " "
-    , ppSep     = "     "
-    , ppLayout  = dzenColor "#aaaaaa" "" . wrap "· " " ·"
-    , ppTitle   = dzenColor "#ffffff" "" . shorten 20
     }
 
 -- default layout is fullscreen with smartborders
@@ -83,14 +71,6 @@ myManageHook = composeAll
     ]
 
 myWorkspaces    = ["1","2","3","4","5"]
-
--- clickable workspaces via dzen/xdotool
---myWorkspaces            :: [String]
---myWorkspaces            = clickable . (map dzenEscape) $ ["1","2","3","4","5"]
- 
---  where clickable l     = [ "^ca(1,xdotool key super+" ++ show (n) ++ ")" ++ ws ++ "^ca()" |
---                            (i,ws) <- zip [1..] l,
---                            let n = i ]
 
 myKeys :: [(String, X())]
 myKeys = [ ("M-b"        , sendMessage ToggleStruts              ) -- Toggle the status bar gap
