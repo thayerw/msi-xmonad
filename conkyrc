@@ -1,0 +1,20 @@
+# ~/.conkyrc
+# Thayer Williams - http://cinderwick.ca
+# vim:nu:ai:si:et:ts=4:sw=4:ft=conkyrc:
+
+background no
+out_to_x no
+out_to_console yes
+update_interval 3
+total_run_times 0
+use_spacer none
+
+TEXT
+<fc=\#999999>${hwmon temp 1}°</fc>  \
+<fc=\#666666>${loadavg 1}</fc>  \
+<fc=\#888888>${cpu cpu1}%</fc>   <fc=\#aaaaaa>${freq_g 1}GHz</fc>   \
+<fc=\#666666>${mem}</fc>   \
+<fc=\#91b8ff>${if_existing /sys/class/power_supply/BAT1/present}Bat ${battery_percent BAT1}% (${battery_time BAT1})${else}AC${endif}</fc>   \
+${if_empty ${exec ifconfig wlan0 | grep 'inet addr:'}}<fc=\#bbbbbb>eth0</fc>  <fc=\#d94c3d>${upspeedf eth0}k</fc>  <fc=\#a4bc51>${downspeedf eth0}k</fc>${else}\
+<fc=\#bbbbbb>${wireless_link_qual_perc wlan0}%  ${wireless_essid wlan0}</fc>  <fc=\#d94c3d>${upspeedf wlan0}k</fc>  <fc=\#a4bc51>${downspeedf wlan0}k</fc>${endif}   \
+<fc=\#ffffff>${time %b %d %H:%M}</fc>
