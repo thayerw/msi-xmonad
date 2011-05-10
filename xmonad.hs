@@ -36,20 +36,9 @@ main = do
             `additionalKeysP` myKeys
             `additionalMouseBindings` myButtons
 
-myLogHook h = dynamicLogWithPP $ myXmobarPP { ppOutput = hPutStrLn h }
+myWorkspaces    = ["1","2","3","4","5"]
 
-myXmobar   = "xmobar ~/.xmonad/xmobarrc"
-myXmobarPP = xmobarPP
-    { ppCurrent = xmobarColor "#3399ff" "" . wrap " " " "
-    , ppHidden  = xmobarColor "#dddddd" "" . wrap " " " "
-    , ppHiddenNoWindows = xmobarColor "#777777" "" . wrap " " " "
-    , ppUrgent  = xmobarColor "#ff0000" "" . wrap " " " "
-    , ppSep     = "     "
-    , ppLayout  = xmobarColor "#aaaaaa" "" . wrap "·" "·"
-    , ppTitle   = xmobarColor "#ffffff" "" . shorten 25
-    }
-
--- default layout is fullscreen with smartborders
+-- default layout is fullscreen with smartborders applied to all
 myLayoutHook = avoidStruts $ smartBorders ( full ||| mtiled ||| tiled )
   where
     full    = named "X" $ Full
@@ -70,9 +59,19 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doF (W.shift (myWorkspaces !! 3))
     ]
 
-myWorkspaces    = ["1","2","3","4","5"]
+myLogHook h = dynamicLogWithPP $ myXmobarPP { ppOutput = hPutStrLn h }
 
-myKeys :: [(String, X())]
+myXmobar   = "xmobar ~/.xmonad/xmobarrc"
+myXmobarPP = xmobarPP
+    { ppCurrent = xmobarColor "#3399ff" "" . wrap " " " "
+    , ppHidden  = xmobarColor "#dddddd" "" . wrap " " " "
+    , ppHiddenNoWindows = xmobarColor "#777777" "" . wrap " " " "
+    , ppUrgent  = xmobarColor "#ff0000" "" . wrap " " " "
+    , ppSep     = "     "
+    , ppLayout  = xmobarColor "#aaaaaa" "" . wrap "·" "·"
+    , ppTitle   = xmobarColor "#ffffff" "" . shorten 25
+    }
+
 myKeys = [ ("M-b"        , sendMessage ToggleStruts              ) -- Toggle the status bar gap
          , ("M1-<Tab>"   , windows W.focusDown                   ) -- Move focus to the next window (alt-tab)
          , ("M-<Return>" , dwmpromote                            ) -- Swap the focused window and the master window
