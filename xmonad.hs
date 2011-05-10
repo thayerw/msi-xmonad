@@ -17,7 +17,7 @@ import XMonad.Util.Run(spawnPipe)  -- spawnPipe and hPutStrLn
 import XMonad.Util.EZConfig        -- append key/mouse bindings
 import System.IO                   -- hPutStrLn scope
 
-import qualified XMonad.StackSet as W   -- for window manipulation (see W below)
+import qualified XMonad.StackSet as W   -- for window manipulation
 
 main = do
         status <- spawnPipe myXmobar
@@ -52,11 +52,9 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doFloat
     , className =? "XCalc"          --> doFloat
     , className =? "Wicd-client.py" --> doFloat
-    , resource  =? "desktop_window" --> doIgnore
-    , resource  =? "kdesktop"       --> doIgnore 
-    , className =? "Chromium"       --> doF (W.shift (myWorkspaces !! 1))
-    , className =? "Nautilus"       --> doF (W.shift (myWorkspaces !! 2))
-    , className =? "Gimp"           --> doF (W.shift (myWorkspaces !! 3))
+    , className =? "Chromium"       --> doShift "2"
+    , className =? "Nautilus"       --> doShift "3"
+    , className =? "Gimp"           --> doShift "4"
     ]
 
 myLogHook h = dynamicLogWithPP $ myXmobarPP { ppOutput = hPutStrLn h }
