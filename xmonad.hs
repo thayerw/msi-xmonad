@@ -20,7 +20,7 @@ import System.IO                   -- hPutStrLn scope
 import qualified XMonad.StackSet as W   -- for window manipulation
 
 main = do
-        status <- spawnPipe myXmobar
+        status <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
         xmonad $ defaultConfig 
             { modMask            = mod4Mask
             , terminal           = "urxvtcd"
@@ -59,7 +59,6 @@ myManageHook = composeAll
 
 myLogHook h = dynamicLogWithPP $ myXmobarPP { ppOutput = hPutStrLn h }
 
-myXmobar   = "xmobar ~/.xmonad/xmobarrc"
 myXmobarPP = xmobarPP
     { ppCurrent = xmobarColor "#3399ff" "" . wrap " " " "
     , ppHidden  = xmobarColor "#dddddd" "" . wrap " " " "
