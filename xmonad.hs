@@ -7,17 +7,16 @@
 --
 
 import XMonad
+import XMonad.Actions.CycleWindows -- classic alt-tab
+import XMonad.Actions.CycleWS      -- cycle thru WS', toggle last WS
+import XMonad.Actions.DwmPromote   -- swap master like dwm
 import XMonad.Hooks.DynamicLog     -- statusbar 
 import XMonad.Hooks.ManageDocks    -- dock/tray mgmt
-import XMonad.Actions.CycleWS      -- cycle thru WS', toggle last WS
-import XMonad.Layout.NoBorders     -- smart borders on solo clients
 import XMonad.Layout.Named         -- custom layout names
-import XMonad.Actions.DwmPromote   -- swap master like dwm
-import XMonad.Util.Run(spawnPipe)  -- spawnPipe and hPutStrLn
+import XMonad.Layout.NoBorders     -- smart borders on solo clients
 import XMonad.Util.EZConfig        -- append key/mouse bindings
+import XMonad.Util.Run(spawnPipe)  -- spawnPipe and hPutStrLn
 import System.IO                   -- hPutStrLn scope
-
-import qualified XMonad.StackSet as W   -- window manipulation
 
 main = do
         status <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
@@ -69,7 +68,7 @@ myXmobarPP = xmobarPP
     }
 
 myKeys = [ ("M-b"        , sendMessage ToggleStruts              ) -- toggle the status bar gap
-         , ("M1-<Tab>"   , windows W.focusDown                   ) -- move focus to the next window (alt-tab)
+         , ("M1-<Tab>"   , cycleRecentWindows [xK_Alt_L] xK_Tab xK_Tab ) -- classic alt-tab behaviour
          , ("M-<Return>" , dwmpromote                            ) -- swap the focused window and the master window
          , ("M-<Tab>"    , toggleWS                              ) -- toggle last workspace (super-tab)
          , ("M-<Right>"  , nextWS                                ) -- go to next workspace
@@ -89,9 +88,7 @@ myKeys = [ ("M-b"        , sendMessage ToggleStruts              ) -- toggle the
          , ("C-M1-<Insert>" , spawn "sudo shutdown -h now"       ) -- poweroff
          ]
 
-myButtons = [ ((mod4Mask, button4), (\_ -> windows W.focusUp    ))
-            , ((mod4Mask, button5), (\_ -> windows W.focusDown  )) 
-            , ((0, 8), (\_ -> prevWS )) -- cycle workspaces 
+myButtons = [ ((0, 8), (\_ -> prevWS )) -- cycle workspaces 
             , ((0, 9), (\_ -> nextWS )) -- with thumb buttons 
             ]
 
