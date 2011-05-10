@@ -2,8 +2,8 @@
 -- File     : ~/.xmonad/xmonad.hs
 -- Author   : Thayer Williams
 -- Website  : http://cinderwick.ca/
--- Desc     : A minimalist xmonad config I use for my netbook where I
---            spend most of my time working in Full mode.
+-- Desc     : A minimal xmonad config geared towards netbooks 
+--            and other low-resolution devices.
 --
 
 import XMonad
@@ -17,7 +17,7 @@ import XMonad.Util.Run(spawnPipe)  -- spawnPipe and hPutStrLn
 import XMonad.Util.EZConfig        -- append key/mouse bindings
 import System.IO                   -- hPutStrLn scope
 
-import qualified XMonad.StackSet as W   -- for window manipulation
+import qualified XMonad.StackSet as W   -- window manipulation
 
 main = do
         status <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
@@ -51,7 +51,6 @@ myManageHook = composeAll
     , className =? "Vlc"            --> doFloat
     , className =? "Gimp"           --> doFloat
     , className =? "XCalc"          --> doFloat
-    , className =? "Wicd-client.py" --> doFloat
     , className =? "Chromium"       --> doShift "2"
     , className =? "Nautilus"       --> doShift "3"
     , className =? "Gimp"           --> doShift "4"
@@ -69,18 +68,18 @@ myXmobarPP = xmobarPP
     , ppTitle   = xmobarColor "#ffffff" "" . shorten 25
     }
 
-myKeys = [ ("M-b"        , sendMessage ToggleStruts              ) -- Toggle the status bar gap
-         , ("M1-<Tab>"   , windows W.focusDown                   ) -- Move focus to the next window (alt-tab)
-         , ("M-<Return>" , dwmpromote                            ) -- Swap the focused window and the master window
-         , ("M-<Tab>"    , toggleWS                              ) -- Toggle last workspace (super-tab)
-         , ("M-<Right>"  , nextWS                                ) -- Go to next workspace
-         , ("M-<Left>"   , prevWS                                ) -- Go to prev workspace
-         , ("M-S-<Right>", shiftToNext                           ) -- Shift client to next workspace
-         , ("M-S-<Left>" , shiftToPrev                           ) -- Shift client to prev workspace
-         , ("M-c"        , spawn "xcalc"                         ) -- app launcher
+myKeys = [ ("M-b"        , sendMessage ToggleStruts              ) -- toggle the status bar gap
+         , ("M1-<Tab>"   , windows W.focusDown                   ) -- move focus to the next window (alt-tab)
+         , ("M-<Return>" , dwmpromote                            ) -- swap the focused window and the master window
+         , ("M-<Tab>"    , toggleWS                              ) -- toggle last workspace (super-tab)
+         , ("M-<Right>"  , nextWS                                ) -- go to next workspace
+         , ("M-<Left>"   , prevWS                                ) -- go to prev workspace
+         , ("M-S-<Right>", shiftToNext                           ) -- move client to next workspace
+         , ("M-S-<Left>" , shiftToPrev                           ) -- move client to prev workspace
+         , ("M-c"        , spawn "xcalc"                         ) -- calc
          , ("M-p"        , spawn "gmrun"                         ) -- app launcher
          , ("M-n"        , spawn "wicd-client -n"                ) -- network manager
-         , ("M-r"        , spawn "xmonad --restart"              ) -- Restart xmonad w/o recompiling
+         , ("M-r"        , spawn "xmonad --restart"              ) -- restart xmonad w/o recompiling
          , ("M-w"        , spawn "chromium"                      ) -- launch browser
          , ("M-S-w"      , spawn "chromium --incognito"          ) -- launch private browser
          , ("M-e"        , spawn "nautilus"                      ) -- launch file manager
