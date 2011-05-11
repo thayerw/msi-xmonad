@@ -19,7 +19,8 @@ import XMonad.Util.Run(spawnPipe)  -- spawnPipe and hPutStrLn
 import System.IO                   -- hPutStrLn scope
 
 main = do
-        status <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
+        status <- spawnPipe myDzenStatus
+        conky  <- spawnPipe myDzenConky
         xmonad $ defaultConfig 
             { modMask            = mod4Mask
             , terminal           = "urxvtcd"
@@ -33,9 +34,17 @@ main = do
             , logHook    = myLogHook status
             } 
             `additionalKeysP` myKeys
-            `additionalMouseBindings` myButtons
 
-myWorkspaces    = ["1","2","3","4","5"]
+--myWorkspaces    = ["1","2","3","4","5"]
+
+-- clickable workspaces via dzen/xdotool
+myWorkspaces            :: [String]
+myWorkspaces            = clickable . (map dzenEscape) $ ["1","2","3","4","5"]
+ 
+  where clickable l     = [ "^ca(1,xdotool key super+" ++ show (n) ++ ")" ++ ws ++ "^ca()" |
+                            (i,ws) <- zip [1..] l,
+                            let n = i ]
+
 
 -- default layout is fullscreen with smartborders applied to all
 myLayoutHook = avoidStruts $ smartBorders ( full ||| mtiled ||| tiled )
@@ -55,8 +64,10 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doShift "4"
     ]
 
-myLogHook h = dynamicLogWithPP $ myXmobarPP { ppOutput = hPutStrLn h }
+--myLogHook h = dynamicLogWithPP $ myXmobarPP { ppOutput = hPutStrLn h }
+myLogHook h = dynamicLogWithPP $ myDzenPP { ppOutput = hPutStrLn h }
 
+myXmobar   = "xmobar ~/.xmonad/xmobarrc"
 myXmobarPP = xmobarPP
     { ppCurrent = xmobarColor "#3399ff" "" . wrap " " " "
     , ppHidden  = xmobarColor "#dddddd" "" . wrap " " " "
@@ -65,6 +76,20 @@ myXmobarPP = xmobarPP
     , ppSep     = "     "
     , ppLayout  = xmobarColor "#aaaaaa" "" . wrap "·" "·"
     , ppTitle   = xmobarColor "#ffffff" "" . shorten 25
+    }
+
+myDzenStatus = "dzen2 -x '0' -y '0' -h '20' -w '320' -ta 'l' -fg '#777777' -bg '#222222' -fn 'arial:bold:size=11'"
+myDzenConky  = "conky -c ~/.xmonad/conkyrc-dzen | dzen2 -x '320' -y '0' -h '20' -w '704' -ta 'r' -fg '#777777' -bg '#222222' -fn 'arial:bold:size=11'"
+myDzenPP  = dzenPP
+    { ppCurrent = dzenColor "#3399ff" "" . wrap " " " "
+    , ppHidden  = dzenColor "#dddddd" "" . wrap " " " "
+    , ppHiddenNoWindows = dzenColor "#777777" "" . wrap " " " "
+    , ppUrgent  = dzenColor "#ff0000" "" . wrap " " " "
+    , ppSep     = "     "
+    , ppLayout  = dzenColor "#aaaaaa" "" . wrap "^ca(1,xdotool key super+space)· " " ·^ca()"
+    , ppTitle   = dzenColor "#ffffff" "" 
+                    . wrap "^ca(1,xdotool key super+k)^ca(2,xdotool key super+shift+c)" "  ^ca()^ca()" 
+                    . shorten 20
     }
 
 myKeys = [ ("M-b"        , sendMessage ToggleStruts              ) -- toggle the status bar gap
@@ -87,9 +112,5 @@ myKeys = [ ("M-b"        , sendMessage ToggleStruts              ) -- toggle the
          , ("C-M1-<Delete>" , spawn "sudo shutdown -r now"       ) -- reboot
          , ("C-M1-<Insert>" , spawn "sudo shutdown -h now"       ) -- poweroff
          ]
-
-myButtons = [ ((0, 8), (\_ -> prevWS )) -- cycle workspaces 
-            , ((0, 9), (\_ -> nextWS )) -- with thumb buttons 
-            ]
 
 -- vim:sw=4 sts=4 ts=4 tw=0 et ai 
