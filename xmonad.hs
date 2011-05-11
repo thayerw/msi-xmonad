@@ -1,9 +1,17 @@
 --
--- File     : ~/.xmonad/xmonad.hs
+-- File     : ~/.xmonad/xmonad.hs (for Xmonad >= 0.9)
 -- Author   : Thayer Williams
 -- Website  : http://cinderwick.ca/
--- Desc     : A minimal xmonad config geared towards netbooks 
---            and other low-resolution devices.
+-- Desc     : A simple, mouse-friendly xmonad config geared towards
+--            netbooks and other low-resolution devices.
+--
+--            dzen is used for statusbar rendering, with optional mouse
+--            integration provided by xdotool:
+--
+--             * left-click workspace num to go to that ws
+--             * left-click layout to cycle next layout
+--             * left-click window title to cycle next window
+--             * middle-click window title to kill focused window
 --
 
 import XMonad
@@ -18,9 +26,11 @@ import XMonad.Util.EZConfig        -- append key/mouse bindings
 import XMonad.Util.Run(spawnPipe)  -- spawnPipe and hPutStrLn
 import System.IO                   -- hPutStrLn scope
 
+import qualified XMonad.StackSet as W   -- manageHook rules
+
 main = do
-        status <- spawnPipe myDzenStatus
-        conky  <- spawnPipe myDzenConky
+        status <- spawnPipe myDzenStatus    -- xmonad status on the left
+        conky  <- spawnPipe myDzenConky     -- conky stats on the right
         xmonad $ defaultConfig 
             { modMask            = mod4Mask
             , terminal           = "urxvtcd"
@@ -35,8 +45,7 @@ main = do
             } 
             `additionalKeysP` myKeys
 
---myWorkspaces    = ["1","2","3","4","5"]
-
+-- Tags/Workspaces
 -- clickable workspaces via dzen/xdotool
 myWorkspaces            :: [String]
 myWorkspaces            = clickable . (map dzenEscape) $ ["1","2","3","4","5"]
@@ -45,8 +54,8 @@ myWorkspaces            = clickable . (map dzenEscape) $ ["1","2","3","4","5"]
                             (i,ws) <- zip [1..] l,
                             let n = i ]
 
-
--- default layout is fullscreen with smartborders applied to all
+-- Layouts
+-- the default layout is fullscreen with smartborders applied to all
 myLayoutHook = avoidStruts $ smartBorders ( full ||| mtiled ||| tiled )
   where
     full    = named "X" $ Full
@@ -54,32 +63,26 @@ myLayoutHook = avoidStruts $ smartBorders ( full ||| mtiled ||| tiled )
     tiled   = named "T" $ Tall 1 (5/100) (2/(1+(toRational(sqrt(5)::Double))))
     -- sets default tile as: Tall nmaster (delta) (golden ratio)
 
+-- Window management
+--
 myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Vlc"            --> doFloat
     , className =? "Gimp"           --> doFloat
     , className =? "XCalc"          --> doFloat
-    , className =? "Chromium"       --> doShift "2"
-    , className =? "Nautilus"       --> doShift "3"
-    , className =? "Gimp"           --> doShift "4"
+    , className =? "Chromium"       --> doF (W.shift (myWorkspaces !! 1)) -- open on ws 2
+    , className =? "Nautilus"       --> doF (W.shift (myWorkspaces !! 2)) -- open on ws 3
+    , className =? "Gimp"           --> doF (W.shift (myWorkspaces !! 3)) -- open on ws 4
     ]
 
---myLogHook h = dynamicLogWithPP $ myXmobarPP { ppOutput = hPutStrLn h }
+-- Statusbar 
+--
 myLogHook h = dynamicLogWithPP $ myDzenPP { ppOutput = hPutStrLn h }
 
-myXmobar   = "xmobar ~/.xmonad/xmobarrc"
-myXmobarPP = xmobarPP
-    { ppCurrent = xmobarColor "#3399ff" "" . wrap " " " "
-    , ppHidden  = xmobarColor "#dddddd" "" . wrap " " " "
-    , ppHiddenNoWindows = xmobarColor "#777777" "" . wrap " " " "
-    , ppUrgent  = xmobarColor "#ff0000" "" . wrap " " " "
-    , ppSep     = "     "
-    , ppLayout  = xmobarColor "#aaaaaa" "" . wrap "·" "·"
-    , ppTitle   = xmobarColor "#ffffff" "" . shorten 25
-    }
+myDzenStatus = "dzen2 -h '20' -w '320' -ta 'l'" ++ myDzenStyle
+myDzenConky  = "conky -c ~/.xmonad/conkyrc | dzen2 -x '320' -h '20' -w '704' -ta 'r'" ++ myDzenStyle
+myDzenStyle  = " -fg '#777777' -bg '#222222' -fn 'arial:bold:size=11'"
 
-myDzenStatus = "dzen2 -x '0' -y '0' -h '20' -w '320' -ta 'l' -fg '#777777' -bg '#222222' -fn 'arial:bold:size=11'"
-myDzenConky  = "conky -c ~/.xmonad/conkyrc-dzen | dzen2 -x '320' -y '0' -h '20' -w '704' -ta 'r' -fg '#777777' -bg '#222222' -fn 'arial:bold:size=11'"
 myDzenPP  = dzenPP
     { ppCurrent = dzenColor "#3399ff" "" . wrap " " " "
     , ppHidden  = dzenColor "#dddddd" "" . wrap " " " "
@@ -92,6 +95,8 @@ myDzenPP  = dzenPP
                     . shorten 20
     }
 
+-- Key bindings
+--
 myKeys = [ ("M-b"        , sendMessage ToggleStruts              ) -- toggle the status bar gap
          , ("M1-<Tab>"   , cycleRecentWindows [xK_Alt_L] xK_Tab xK_Tab ) -- classic alt-tab behaviour
          , ("M-<Return>" , dwmpromote                            ) -- swap the focused window and the master window
