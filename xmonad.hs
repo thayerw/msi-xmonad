@@ -75,6 +75,7 @@ myManageHook = composeAll
     , className =? "Chromium"       --> doF (W.shift (myWorkspaces !! 1)) -- open on ws 2
     , className =? "Nautilus"       --> doF (W.shift (myWorkspaces !! 2)) -- open on ws 3
     , className =? "Gimp"           --> doF (W.shift (myWorkspaces !! 3)) -- open on ws 4
+    , className =? "stalonetray"    --> doIgnore
     ]
 
 -- Statusbar 
