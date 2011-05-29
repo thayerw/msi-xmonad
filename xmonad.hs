@@ -94,8 +94,8 @@ myDzenPP  = dzenPP
     , ppSep     = "     "
     , ppLayout  = dzenColor "#aaaaaa" "" . wrap "^ca(1,xdotool key super+space)· " " ·^ca()"
     , ppTitle   = dzenColor "#ffffff" "" 
-                    . wrap "^ca(1,xdotool key super+k)^ca(2,xdotool key super+shift+c)" "  ^ca()^ca()" 
-                    . shorten 20
+                    . wrap "^ca(1,xdotool key super+k)^ca(2,xdotool key super+shift+c)"
+                           "                          ^ca()^ca()" . shorten 20 . dzenEscape
     }
 
 -- Key bindings
