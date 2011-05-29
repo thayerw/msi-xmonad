@@ -11,7 +11,9 @@ import XMonad.Actions.CycleWindows -- classic alt-tab
 import XMonad.Actions.CycleWS      -- cycle thru WS', toggle last WS
 import XMonad.Actions.DwmPromote   -- swap master like dwm
 import XMonad.Hooks.DynamicLog     -- statusbar 
+import XMonad.Hooks.EwmhDesktops   -- fullscreenEventHook fixes chrome fullscreen
 import XMonad.Hooks.ManageDocks    -- dock/tray mgmt
+import XMonad.Hooks.UrgencyHook    -- window alert bells 
 import XMonad.Layout.Named         -- custom layout names
 import XMonad.Layout.NoBorders     -- smart borders on solo clients
 import XMonad.Util.EZConfig        -- append key/mouse bindings
@@ -20,12 +22,13 @@ import System.IO                   -- hPutStrLn scope
 
 main = do
         status <- spawnPipe "xmobar ~/.xmonad/xmobarrc"
-        xmonad $ defaultConfig 
+        xmonad $ withUrgencyHook NoUrgencyHook $ defaultConfig 
             { modMask            = mod4Mask
             , terminal           = "urxvtcd"
             , borderWidth        = 2
             , normalBorderColor  = "#dddddd"
             , focusedBorderColor = "#0000ff"
+            , handleEventHook    = fullscreenEventHook
             , workspaces = myWorkspaces
             , layoutHook = myLayoutHook
             , manageHook = manageDocks <+> myManageHook
@@ -58,6 +61,7 @@ myManageHook = composeAll
     , className =? "Chromium"       --> doShift "2" -- send to ws 2
     , className =? "Nautilus"       --> doShift "3" -- send to ws 3
     , className =? "Gimp"           --> doShift "4" -- send to ws 4
+    , className =? "stalonetray"    --> doIgnore
     ]
 
 -- Statusbar 
