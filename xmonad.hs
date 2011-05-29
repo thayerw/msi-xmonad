@@ -21,6 +21,7 @@ import XMonad.Actions.DwmPromote   -- swap master like dwm
 import XMonad.Hooks.DynamicLog     -- statusbar 
 import XMonad.Hooks.EwmhDesktops   -- fullscreenEventHook fixes chrome fullscreen
 import XMonad.Hooks.ManageDocks    -- dock/tray mgmt
+import XMonad.Hooks.UrgencyHook    -- window alert bells 
 import XMonad.Layout.Named         -- custom layout names
 import XMonad.Layout.NoBorders     -- smart borders on solo clients
 import XMonad.Util.EZConfig        -- append key/mouse bindings
@@ -32,7 +33,7 @@ import qualified XMonad.StackSet as W   -- manageHook rules
 main = do
         status <- spawnPipe myDzenStatus    -- xmonad status on the left
         conky  <- spawnPipe myDzenConky     -- conky stats on the right
-        xmonad $ defaultConfig 
+        xmonad $ withUrgencyHook NoUrgencyHook $ defaultConfig 
             { modMask            = mod4Mask
             , terminal           = "urxvtcd"
             , borderWidth        = 2
@@ -72,9 +73,9 @@ myManageHook = composeAll
     , className =? "Vlc"            --> doFloat
     , className =? "Gimp"           --> doFloat
     , className =? "XCalc"          --> doFloat
-    , className =? "Chromium"       --> doF (W.shift (myWorkspaces !! 1)) -- open on ws 2
-    , className =? "Nautilus"       --> doF (W.shift (myWorkspaces !! 2)) -- open on ws 3
-    , className =? "Gimp"           --> doF (W.shift (myWorkspaces !! 3)) -- open on ws 4
+    , className =? "Chromium"       --> doF (W.shift (myWorkspaces !! 1)) -- send to ws 2
+    , className =? "Nautilus"       --> doF (W.shift (myWorkspaces !! 2)) -- send to ws 3
+    , className =? "Gimp"           --> doF (W.shift (myWorkspaces !! 3)) -- send to ws 4
     , className =? "stalonetray"    --> doIgnore
     ]
 
